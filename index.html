@@ -496,7 +496,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="wholeGrains"
                                                             value={option.value}
-                                                            checked={formData.wholeGrains == option.value}
+                                                            checked={formData.wholeGrains === String(option.value)}
                                                             onChange={(e) => handleChange('wholeGrains', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -527,7 +527,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="potatoes"
                                                             value={option.value}
-                                                            checked={formData.potatoes == option.value}
+                                                            checked={formData.potatoes === String(option.value)}
                                                             onChange={(e) => handleChange('potatoes', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -557,7 +557,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="vegetables"
                                                             value={option.value}
-                                                            checked={formData.vegetables == option.value}
+                                                            checked={formData.vegetables === String(option.value)}
                                                             onChange={(e) => handleChange('vegetables', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -586,7 +586,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="fruits"
                                                             value={option.value}
-                                                            checked={formData.fruits == option.value}
+                                                            checked={formData.fruits === String(option.value)}
                                                             onChange={(e) => handleChange('fruits', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -615,7 +615,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="nutsSeeds"
                                                             value={option.value}
-                                                            checked={formData.nutsSeeds == option.value}
+                                                            checked={formData.nutsSeeds === String(option.value)}
                                                             onChange={(e) => handleChange('nutsSeeds', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -645,7 +645,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="soyLegumes"
                                                             value={option.value}
-                                                            checked={formData.soyLegumes == option.value}
+                                                            checked={formData.soyLegumes === String(option.value)}
                                                             onChange={(e) => handleChange('soyLegumes', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -676,7 +676,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="nonSoyLegumes"
                                                             value={option.value}
-                                                            checked={formData.nonSoyLegumes == option.value}
+                                                            checked={formData.nonSoyLegumes === String(option.value)}
                                                             onChange={(e) => handleChange('nonSoyLegumes', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -717,7 +717,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="dairy"
                                                             value={option.value}
-                                                            checked={formData.dairy == option.value}
+                                                            checked={formData.dairy === String(option.value)}
                                                             onChange={(e) => handleChange('dairy', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -748,7 +748,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="chicken"
                                                             value={option.value}
-                                                            checked={formData.chicken == option.value}
+                                                            checked={formData.chicken === String(option.value)}
                                                             onChange={(e) => handleChange('chicken', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -779,7 +779,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="fish"
                                                             value={option.value}
-                                                            checked={formData.fish == option.value}
+                                                            checked={formData.fish === String(option.value)}
                                                             onChange={(e) => handleChange('fish', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -811,7 +811,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="eggs"
                                                             value={option.value}
-                                                            checked={formData.eggs == option.value}
+                                                            checked={formData.eggs === String(option.value)}
                                                             onChange={(e) => handleChange('eggs', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -842,7 +842,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="redMeat"
                                                             value={option.value}
-                                                            checked={formData.redMeat == option.value}
+                                                            checked={formData.redMeat === String(option.value)}
                                                             onChange={(e) => handleChange('redMeat', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -881,7 +881,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="vegetableOils"
                                                             value={option.value}
-                                                            checked={formData.vegetableOils == option.value}
+                                                            checked={formData.vegetableOils === String(option.value)}
                                                             onChange={(e) => handleChange('vegetableOils', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -911,7 +911,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="saturatedFats"
                                                             value={option.value}
-                                                            checked={formData.saturatedFats == option.value}
+                                                            checked={formData.saturatedFats === String(option.value)}
                                                             onChange={(e) => handleChange('saturatedFats', e.target.value)}
                                                             className="mr-2"
                                                         />
@@ -943,7 +943,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                             type="radio"
                                                             name="addedSugars"
                                                             value={option.value}
-                                                            checked={formData.addedSugars == option.value}
+                                                            checked={formData.addedSugars === String(option.value)}
                                                             onChange={(e) => handleChange('addedSugars', e.target.value)}
                                                             className="mr-2"
                                                         />
