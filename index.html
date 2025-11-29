@@ -16,6 +16,7 @@
         const { useState, useEffect } = React;
 
         function PHDIQuestionnaire() {
+            const [dietaryPattern, setDietaryPattern] = useState('balanced');
             const [formData, setFormData] = useState({
                 fruits: '',
                 vegetables: '',
@@ -54,6 +55,36 @@
                 setFormData(prev => ({ ...prev, [field]: value }));
             };
 
+            const handlePatternChange = (newPattern) => {
+                const hasData = Object.values(formData).some(value => value !== '');
+
+                if (hasData) {
+                    if (confirm('Changing dietary pattern will clear all your current selections. Continue?')) {
+                        setDietaryPattern(newPattern);
+                        setFormData({
+                            fruits: '',
+                            vegetables: '',
+                            wholeGrains: '',
+                            soyLegumes: '',
+                            nonSoyLegumes: '',
+                            nutsSeeds: '',
+                            redMeat: '',
+                            chicken: '',
+                            fish: '',
+                            eggs: '',
+                            dairy: '',
+                            vegetableOils: '',
+                            saturatedFats: '',
+                            potatoes: '',
+                            addedSugars: ''
+                        });
+                        setResults(null);
+                    }
+                } else {
+                    setDietaryPattern(newPattern);
+                }
+            };
+
             const handleReset = () => {
                 setFormData({
                     fruits: '',
@@ -75,8 +106,77 @@
                 setResults(null);
             };
 
+            // Pattern-specific targets based on EAT-Lancet Table DP1
+            const dietaryTargets = {
+                balanced: {
+                    wholeGrains: 75,    // 196g total / 7 * 100g servings per week = ~75g/day target
+                    vegetables: 300,
+                    fruits: 200,
+                    nutsSeeds: 50,
+                    legumes: 75,        // Combined soy (50g) + non-soy (25g) from original
+                    dairy: 250,
+                    chicken: 30,
+                    fish: 28,
+                    eggs: 13,
+                    redMeat: 15,
+                    vegetableOils: 46,
+                    saturatedFats: 0,
+                    potatoes: 50,
+                    addedSugars: 30
+                },
+                pescatarian: {
+                    wholeGrains: 75,
+                    vegetables: 350,
+                    fruits: 250,
+                    nutsSeeds: 50,
+                    legumes: 80,
+                    dairy: 250,
+                    chicken: 0,
+                    fish: 30,
+                    eggs: 15,
+                    redMeat: 0,
+                    vegetableOils: 49,
+                    saturatedFats: 0,
+                    potatoes: 50,
+                    addedSugars: 30
+                },
+                vegetarian: {
+                    wholeGrains: 75,
+                    vegetables: 375,
+                    fruits: 275,
+                    nutsSeeds: 50,
+                    legumes: 85,
+                    dairy: 250,
+                    chicken: 0,
+                    fish: 0,
+                    eggs: 15,
+                    redMeat: 0,
+                    vegetableOils: 49,
+                    saturatedFats: 0,
+                    potatoes: 50,
+                    addedSugars: 30
+                },
+                vegan: {
+                    wholeGrains: 75,
+                    vegetables: 500,
+                    fruits: 300,
+                    nutsSeeds: 50,
+                    legumes: 100,
+                    dairy: 0,
+                    chicken: 0,
+                    fish: 0,
+                    eggs: 0,
+                    redMeat: 0,
+                    vegetableOils: 54,
+                    saturatedFats: 0,
+                    potatoes: 50,
+                    addedSugars: 30
+                }
+            };
+
             const calculateScore = () => {
                 const scores = {};
+                const targets = dietaryTargets[dietaryPattern];
 
                 // Based on PHDI (Planetary Health Diet Index) 2024 scoring methodology
                 // Using EAT-Lancet 2025 reference diet for 2400 kcal/day
@@ -91,85 +191,102 @@
 
                 // OPTIMUM COMPONENTS (more is better - 0 points at 0g, 10 points at target)
 
-                // 1. Whole grains: 100g serving per week, target ≥75g/day
+                // 1. Whole grains: 100g serving per week
                 const wholeGrainsFreq = parseFloat(formData.wholeGrains) || 0;
                 const wholeGrainsPerDay = (wholeGrainsFreq * 100) / 7;
-                scores.wholeGrains = Math.min(10, linearScore(wholeGrainsPerDay, 0, 75, 0, 10));
+                scores.wholeGrains = Math.min(10, linearScore(wholeGrainsPerDay, 0, targets.wholeGrains, 0, 10));
 
-                // 3. Vegetables: 100g serving per day, target ≥300g/day
+                // 3. Vegetables: 100g serving per day
                 const vegFreq = parseFloat(formData.vegetables) || 0;
                 const vegPerDay = vegFreq * 100;
-                scores.vegetables = Math.min(10, linearScore(vegPerDay, 0, 300, 0, 10));
+                scores.vegetables = Math.min(10, linearScore(vegPerDay, 0, targets.vegetables, 0, 10));
 
-                // 4. Fruits: 125g serving per day (100-150g range), target ≥200g/day
+                // 4. Fruits: 125g serving per day (100-150g range)
                 const fruitsFreq = parseFloat(formData.fruits) || 0;
                 const fruitsPerDay = fruitsFreq * 125;
-                scores.fruits = Math.min(10, linearScore(fruitsPerDay, 0, 200, 0, 10));
+                scores.fruits = Math.min(10, linearScore(fruitsPerDay, 0, targets.fruits, 0, 10));
 
-                // 5. Nuts: 30g serving per day, target ≥50g/day
+                // 5. Nuts: 30g serving per day
                 const nutsFreq = parseFloat(formData.nutsSeeds) || 0;
                 const nutsPerDay = nutsFreq * 30;
-                scores.nutsSeeds = Math.min(10, linearScore(nutsPerDay, 0, 50, 0, 10));
+                scores.nutsSeeds = Math.min(10, linearScore(nutsPerDay, 0, targets.nutsSeeds, 0, 10));
 
-                // 6. Soy legumes: 100g serving, target ≥50g/day (weight 0.5)
+                // 6. Soy legumes: 100g serving (weight 0.5)
                 const soyFreq = parseFloat(formData.soyLegumes) || 0;
                 const soyPerDay = (soyFreq * 100) / 7;
-                scores.soyLegumes = Math.min(10, linearScore(soyPerDay, 0, 50, 0, 10));
+                scores.soyLegumes = Math.min(10, linearScore(soyPerDay, 0, targets.legumes * 0.67, 0, 10));
 
-                // 7. Non-soy legumes: 75g serving, target ≥100g/day (weight 0.5)
+                // 7. Non-soy legumes: 75g serving (weight 0.5)
                 const nonSoyFreq = parseFloat(formData.nonSoyLegumes) || 0;
                 const nonSoyPerDay = (nonSoyFreq * 75) / 7;
-                scores.nonSoyLegumes = Math.min(10, linearScore(nonSoyPerDay, 0, 100, 0, 10));
+                scores.nonSoyLegumes = Math.min(10, linearScore(nonSoyPerDay, 0, targets.legumes * 0.33, 0, 10));
 
-                // 10. Fish: 100g serving, target ≥28g/day
+                // 10. Fish: 100g serving
                 const fishFreq = parseFloat(formData.fish) || 0;
                 const fishPerDay = (fishFreq * 100) / 7;
-                scores.fish = Math.min(10, linearScore(fishPerDay, 0, 28, 0, 10));
+                scores.fish = targets.fish > 0 ? Math.min(10, linearScore(fishPerDay, 0, targets.fish, 0, 10)) : 10;
 
-                // 13. Unsaturated plant oils: 30g per serving, min 10g/day (0 pts), target ≥56g/day (10 pts)
-                // PHDI 2024: Based on 3.5% to 21% of TEI at 2400 kcal
+                // 13. Unsaturated plant oils: 30g per serving
                 const oilServings = parseFloat(formData.vegetableOils) || 0;
                 const oilPerDay = oilServings * 30;
-                scores.vegetableOils = Math.min(10, linearScore(oilPerDay, 10, 56, 0, 10));
+                scores.vegetableOils = Math.min(10, linearScore(oilPerDay, 10, targets.vegetableOils + 10, 0, 10));
 
                 // MODERATE COMPONENTS (less is better - 10 points at target or below, 0 at excessive)
 
-                // 2. Tubers: 150g serving per week, max 10 points at ≤50g/day, 0 points at ≥200g/day
+                // 2. Tubers: 150g serving per week
                 const potatoesFreq = parseFloat(formData.potatoes) || 0;
                 const potatoesPerDay = (potatoesFreq * 150) / 7;
-                scores.potatoes = Math.max(0, linearScore(potatoesPerDay, 50, 200, 10, 0));
+                scores.potatoes = Math.max(0, linearScore(potatoesPerDay, targets.potatoes, 200, 10, 0));
 
-                // 8. Dairy: 1 serving = 1 cup milk/200g yogurt/40g cheese, max 10 points at ≤250g/day, 0 at ≥1000g/day
+                // 8. Dairy: 1 serving = 1 cup milk/200g yogurt/40g cheese
                 const dairyFreq = parseFloat(formData.dairy) || 0;
                 const dairyPerDay = (dairyFreq * 250) / 7;  // Assuming average 250g per serving
-                scores.dairy = Math.max(0, linearScore(dairyPerDay, 250, 1000, 10, 0));
+                if (targets.dairy === 0) {
+                    // Vegan: 10 points for no dairy, 0 points for excessive
+                    scores.dairy = Math.max(0, linearScore(dairyPerDay, 0, 500, 10, 0));
+                } else {
+                    scores.dairy = Math.max(0, linearScore(dairyPerDay, targets.dairy, 1000, 10, 0));
+                }
 
-                // 9. Chicken: 100g serving, max 10 points at ≤30g/day, 0 points at ≥100g/day
+                // 9. Chicken: 100g serving
                 const chickenFreq = parseFloat(formData.chicken) || 0;
                 const chickenPerDay = (chickenFreq * 100) / 7;
-                scores.chicken = Math.max(0, linearScore(chickenPerDay, 30, 100, 10, 0));
+                if (targets.chicken === 0) {
+                    // Pescatarian/Vegetarian/Vegan: 10 points for no chicken, 0 for excessive
+                    scores.chicken = Math.max(0, linearScore(chickenPerDay, 0, 100, 10, 0));
+                } else {
+                    scores.chicken = Math.max(0, linearScore(chickenPerDay, targets.chicken, 100, 10, 0));
+                }
 
-                // 11. Eggs: 50g per egg, max 10 points at ≤13g/day, 0 points at ≥120g/day
+                // 11. Eggs: 50g per egg
                 const eggsFreq = parseFloat(formData.eggs) || 0;
                 const eggsPerDay = (eggsFreq * 50) / 7;
-                scores.eggs = Math.max(0, linearScore(eggsPerDay, 13, 120, 10, 0));
+                if (targets.eggs === 0) {
+                    // Vegan: 10 points for no eggs, 0 for excessive
+                    scores.eggs = Math.max(0, linearScore(eggsPerDay, 0, 120, 10, 0));
+                } else {
+                    scores.eggs = Math.max(0, linearScore(eggsPerDay, targets.eggs, 120, 10, 0));
+                }
 
-                // 12. Red meat: 100g serving, max 10 points at ≤15g/day, 0 points at ≥100g/day
+                // 12. Red meat: 100g serving
                 const redMeatFreq = parseFloat(formData.redMeat) || 0;
                 const redMeatPerDay = (redMeatFreq * 100) / 7;
-                scores.redMeat = Math.max(0, linearScore(redMeatPerDay, 15, 100, 10, 0));
+                if (targets.redMeat === 0) {
+                    // Pescatarian/Vegetarian/Vegan: 10 points for no red meat, 0 for excessive
+                    scores.redMeat = Math.max(0, linearScore(redMeatPerDay, 0, 100, 10, 0));
+                } else {
+                    scores.redMeat = Math.max(0, linearScore(redMeatPerDay, targets.redMeat, 100, 10, 0));
+                }
 
-                // 14. Saturated fats: 10g per serving, max 10 points at 0g/day, 0 points at ≥27g/day
-                // PHDI 2024: Based on 0% to 10% of TEI at 2400 kcal (rounded to 30g for simplicity)
+                // 14. Saturated fats: 10g per serving
                 const saturatedServings = parseFloat(formData.saturatedFats) || 0;
                 const saturatedPerDay = saturatedServings * 10;
-                scores.saturatedFats = Math.max(0, linearScore(saturatedPerDay, 0, 30, 10, 0));
+                scores.saturatedFats = Math.max(0, linearScore(saturatedPerDay, targets.saturatedFats, 30, 10, 0));
 
-                // 15. Added sugar: 30g per serving, max 10 points at ≤30g/day, 0 points at ≥150g/day
-                // PHDI 2024: Based on 5% to 25% of TEI at 2400 kcal
+                // 15. Added sugar: 30g per serving
                 const sugarsServings = parseFloat(formData.addedSugars) || 0;
                 const sugarsPerDay = sugarsServings * 30; // Already per day
-                scores.addedSugars = Math.max(0, linearScore(sugarsPerDay, 30, 150, 10, 0));
+                scores.addedSugars = Math.max(0, linearScore(sugarsPerDay, targets.addedSugars, 150, 10, 0));
 
                 // Calculate total score with weights (legumes are 0.5 each, others are 1)
                 const totalScore = scores.wholeGrains + scores.potatoes + scores.vegetables + scores.fruits +
@@ -194,20 +311,25 @@
 
                 // Get top improvement areas
                 // Recommendations based on EAT-Lancet 2025 targets and PHDI 2024 scoring
+                // Pattern-specific recommendations
+                const vegTargetText = dietaryPattern === 'balanced' ? '3+' : dietaryPattern === 'pescatarian' ? '3.5+' : dietaryPattern === 'vegetarian' ? '~4' : '5';
+                const fruitTargetText = dietaryPattern === 'balanced' ? '2' : dietaryPattern === 'pescatarian' ? '2' : dietaryPattern === 'vegetarian' ? '2+' : '2.5';
+                const legumeImportance = dietaryPattern === 'vegan' ? 'IMPORTANT protein source - aim for higher intake' : 'Key plant protein source';
+
                 const componentDetails = [
                     { name: 'Whole Grains', score: scores.wholeGrains, max: 10, emoji: '🌾', rec: 'Aim for 1-2 servings (100g each) daily - brown rice, whole wheat bread, oatmeal' },
                     { name: 'Tubers/Potatoes', score: scores.potatoes, max: 10, emoji: '🥔', rec: 'Limit to ~1 serving (50g) per week - too much reduces score' },
-                    { name: 'Vegetables', score: scores.vegetables, max: 10, emoji: '🥗', rec: 'Aim for 3+ servings (100g each) daily - half your plate at meals' },
-                    { name: 'Fruits', score: scores.fruits, max: 10, emoji: '🍎', rec: 'Aim for 2 servings (150g each) daily - berries, apples, citrus' },
+                    { name: 'Vegetables', score: scores.vegetables, max: 10, emoji: '🥗', rec: `Aim for ${vegTargetText} servings (100g each) daily - half your plate at meals` },
+                    { name: 'Fruits', score: scores.fruits, max: 10, emoji: '🍎', rec: `Aim for ${fruitTargetText} servings (125g each) daily - berries, apples, citrus` },
                     { name: 'Nuts and Seeds', score: scores.nutsSeeds, max: 10, emoji: '🥜', rec: 'Eat 1 serving (30g) daily - almonds, walnuts, pumpkin seeds' },
-                    { name: 'Soy Legumes', score: scores.soyLegumes * 0.5, max: 5, emoji: '🫛', rec: 'Aim for tofu, tempeh, edamame, or soy milk 3-4x/week (100g per serving)' },
-                    { name: 'Non-Soy Legumes', score: scores.nonSoyLegumes * 0.5, max: 5, emoji: '🫘', rec: 'Aim for beans, lentils, chickpeas, peas daily (75g per serving)' },
-                    { name: 'Dairy', score: scores.dairy, max: 10, emoji: '🥛', rec: 'Aim for 1 serving daily - 1 cup milk OR 40g cheese OR 200g yogurt' },
-                    { name: 'Chicken/Poultry', score: scores.chicken, max: 10, emoji: '🍗', rec: 'Limit to ~2 servings (100g) per week or less' },
-                    { name: 'Fish/Seafood', score: scores.fish, max: 10, emoji: '🐟', rec: 'Aim for 2 servings (100g each) per week - salmon, sardines, mackerel' },
-                    { name: 'Eggs', score: scores.eggs, max: 10, emoji: '🥚', rec: 'Limit to ~2 eggs per week or less' },
-                    { name: 'Red Meat', score: scores.redMeat, max: 10, emoji: '🥩', rec: 'Limit to ~1 serving (100g) per week or less' },
-                    { name: 'Vegetable Oils', score: scores.vegetableOils, max: 10, emoji: '🫒', rec: 'Use olive/canola oil for cooking ~2 times daily (30g per use)' },
+                    { name: 'Soy Legumes', score: scores.soyLegumes * 0.5, max: 5, emoji: '🫛', rec: `${legumeImportance} - tofu, tempeh, edamame, soy milk 3-4x/week (100g per serving)` },
+                    { name: 'Non-Soy Legumes', score: scores.nonSoyLegumes * 0.5, max: 5, emoji: '🫘', rec: `${legumeImportance} - beans, lentils, chickpeas, peas ${dietaryPattern === 'vegan' ? 'daily or more' : 'daily'} (75g per serving)` },
+                    { name: 'Dairy', score: scores.dairy, max: 10, emoji: '🥛', rec: dietaryPattern === 'vegan' ? 'Not included in vegan diet - use fortified plant milks for calcium' : 'Aim for 1 serving daily - 1 cup milk OR 40g cheese OR 200g yogurt' },
+                    { name: 'Chicken/Poultry', score: scores.chicken, max: 10, emoji: '🍗', rec: dietaryPattern === 'balanced' ? 'Limit to ~2 servings (100g) per week or less' : 'Not included in your dietary pattern' },
+                    { name: 'Fish/Seafood', score: scores.fish, max: 10, emoji: '🐟', rec: (dietaryPattern === 'balanced' || dietaryPattern === 'pescatarian') ? 'Aim for 2 servings (100g each) per week - salmon, sardines, mackerel' : 'Not included in your dietary pattern' },
+                    { name: 'Eggs', score: scores.eggs, max: 10, emoji: '🥚', rec: dietaryPattern === 'vegan' ? 'Not included in vegan diet' : 'Limit to ~2 eggs per week or less' },
+                    { name: 'Red Meat', score: scores.redMeat, max: 10, emoji: '🥩', rec: dietaryPattern === 'balanced' ? 'Limit to ~1 serving (100g) per week or less' : 'Not included in your dietary pattern' },
+                    { name: 'Vegetable Oils', score: scores.vegetableOils, max: 10, emoji: '🫒', rec: dietaryPattern === 'vegan' ? 'Important for calories - use olive/canola oil ~2x daily' : 'Use olive/canola oil for cooking ~2 times daily (30g per use)' },
                     { name: 'Saturated Fats', score: scores.saturatedFats, max: 10, emoji: '🧈', rec: 'Minimize saturated fats - avoid butter, palm oil, coconut oil, lard' },
                     { name: 'Added Sugars', score: scores.addedSugars, max: 10, emoji: '🍬', rec: 'Minimize sugary foods/drinks - limit to ~1 serving (30g sugar) per day' }
                 ];
@@ -230,7 +352,8 @@
                     interpretation,
                     scores,
                     componentDetails: componentsWithPercent,
-                    topImprovements
+                    topImprovements,
+                    dietaryPattern: dietaryPattern
                 };
 
                 setResults(resultsObj);
@@ -388,12 +511,25 @@ Based on this assessment, please provide personalized coaching to help me improv
             };
 
             const isFormValid = () => {
-                const allFilled = Object.values(formData).every(value => value !== '');
+                // Define required fields based on dietary pattern
+                const requiredFields = ['fruits', 'vegetables', 'wholeGrains', 'soyLegumes', 'nonSoyLegumes',
+                                       'nutsSeeds', 'potatoes', 'vegetableOils', 'saturatedFats', 'addedSugars'];
+
+                // Add animal product fields based on pattern
+                if (dietaryPattern === 'balanced') {
+                    requiredFields.push('redMeat', 'chicken', 'fish', 'eggs', 'dairy');
+                } else if (dietaryPattern === 'pescatarian') {
+                    requiredFields.push('fish', 'eggs', 'dairy');
+                } else if (dietaryPattern === 'vegetarian') {
+                    requiredFields.push('eggs', 'dairy');
+                }
+                // vegan: no animal products needed
+
+                const allFilled = requiredFields.every(field => formData[field] !== '');
                 // Debug: log missing fields
                 if (!allFilled) {
-                    const missingFields = Object.entries(formData)
-                        .filter(([key, value]) => value === '')
-                        .map(([key]) => key);
+                    const missingFields = requiredFields
+                        .filter(field => formData[field] === '');
                     console.log('Missing fields:', missingFields);
                 }
                 return allFilled;
@@ -401,23 +537,41 @@ Based on this assessment, please provide personalized coaching to help me improv
 
             const getIncompleteSections = () => {
                 const section1Fields = ['fruits', 'vegetables', 'wholeGrains', 'soyLegumes', 'nonSoyLegumes', 'nutsSeeds'];
-                const section2Fields = ['redMeat', 'chicken', 'fish', 'eggs', 'dairy'];
                 const section3Fields = ['potatoes', 'vegetableOils', 'saturatedFats', 'addedSugars'];
+
+                // Section 2 fields vary by dietary pattern
+                let section2Fields = [];
+                if (dietaryPattern === 'balanced') {
+                    section2Fields = ['redMeat', 'chicken', 'fish', 'eggs', 'dairy'];
+                } else if (dietaryPattern === 'pescatarian') {
+                    section2Fields = ['fish', 'eggs', 'dairy'];
+                } else if (dietaryPattern === 'vegetarian') {
+                    section2Fields = ['eggs', 'dairy'];
+                } // vegan has no animal products, so empty array
 
                 const sections = [];
                 if (section1Fields.some(field => formData[field] === '')) sections.push('Plant-Based Foods');
-                if (section2Fields.some(field => formData[field] === '')) sections.push('Animal Products');
+                if (section2Fields.length > 0 && section2Fields.some(field => formData[field] === '')) sections.push('Animal Products');
                 if (section3Fields.some(field => formData[field] === '')) sections.push('Fats & Other');
                 return sections;
             };
 
             const isSectionComplete = (section) => {
                 const section1Fields = ['fruits', 'vegetables', 'wholeGrains', 'soyLegumes', 'nonSoyLegumes', 'nutsSeeds'];
-                const section2Fields = ['redMeat', 'chicken', 'fish', 'eggs', 'dairy'];
                 const section3Fields = ['potatoes', 'vegetableOils', 'saturatedFats', 'addedSugars'];
 
+                // Section 2 fields vary by dietary pattern
+                let section2Fields = [];
+                if (dietaryPattern === 'balanced') {
+                    section2Fields = ['redMeat', 'chicken', 'fish', 'eggs', 'dairy'];
+                } else if (dietaryPattern === 'pescatarian') {
+                    section2Fields = ['fish', 'eggs', 'dairy'];
+                } else if (dietaryPattern === 'vegetarian') {
+                    section2Fields = ['eggs', 'dairy'];
+                } // vegan has no animal products, so empty array
+
                 if (section === 1) return section1Fields.every(field => formData[field] !== '');
-                if (section === 2) return section2Fields.every(field => formData[field] !== '');
+                if (section === 2) return section2Fields.length === 0 || section2Fields.every(field => formData[field] !== '');
                 if (section === 3) return section3Fields.every(field => formData[field] !== '');
                 return false;
             };
@@ -464,6 +618,83 @@ Based on this assessment, please provide personalized coaching to help me improv
                                 </div>
                             </div>
                         )}
+
+                        {/* Dietary Pattern Selector */}
+                        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                            <h2 className="text-xl font-bold text-gray-800 mb-3">Select Your Dietary Pattern</h2>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Choose the pattern that best matches your diet. Each pattern has different optimal targets based on EAT-Lancet guidelines.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    dietaryPattern === 'balanced' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                                }`}>
+                                    <input
+                                        type="radio"
+                                        name="dietaryPattern"
+                                        value="balanced"
+                                        checked={dietaryPattern === 'balanced'}
+                                        onChange={(e) => handlePatternChange(e.target.value)}
+                                        className="mr-3"
+                                    />
+                                    <span className="font-semibold text-gray-800">Balanced (All Foods in Moderation)</span>
+                                    <p className="text-sm text-gray-600 ml-6 mt-1">
+                                        Includes all food groups with ~2 servings of animal products daily
+                                    </p>
+                                </label>
+
+                                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    dietaryPattern === 'pescatarian' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                                }`}>
+                                    <input
+                                        type="radio"
+                                        name="dietaryPattern"
+                                        value="pescatarian"
+                                        checked={dietaryPattern === 'pescatarian'}
+                                        onChange={(e) => handlePatternChange(e.target.value)}
+                                        className="mr-3"
+                                    />
+                                    <span className="font-semibold text-gray-800">Pescatarian (Fish, No Meat)</span>
+                                    <p className="text-sm text-gray-600 ml-6 mt-1">
+                                        Fish/seafood, dairy, and eggs - no meat or poultry
+                                    </p>
+                                </label>
+
+                                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    dietaryPattern === 'vegetarian' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                                }`}>
+                                    <input
+                                        type="radio"
+                                        name="dietaryPattern"
+                                        value="vegetarian"
+                                        checked={dietaryPattern === 'vegetarian'}
+                                        onChange={(e) => handlePatternChange(e.target.value)}
+                                        className="mr-3"
+                                    />
+                                    <span className="font-semibold text-gray-800">Vegetarian (Dairy & Eggs, No Meat/Fish)</span>
+                                    <p className="text-sm text-gray-600 ml-6 mt-1">
+                                        Plant-based with dairy and eggs
+                                    </p>
+                                </label>
+
+                                <label className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    dietaryPattern === 'vegan' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                                }`}>
+                                    <input
+                                        type="radio"
+                                        name="dietaryPattern"
+                                        value="vegan"
+                                        checked={dietaryPattern === 'vegan'}
+                                        onChange={(e) => handlePatternChange(e.target.value)}
+                                        className="mr-3"
+                                    />
+                                    <span className="font-semibold text-gray-800">Vegan (100% Plant-Based)</span>
+                                    <p className="text-sm text-gray-600 ml-6 mt-1">
+                                        No animal products
+                                    </p>
+                                </label>
+                            </div>
+                        </div>
 
                         {/* Questionnaire Form */}
                         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -689,6 +920,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                 </div>
 
                                 {/* Section 2: Animal Products */}
+                                {dietaryPattern !== 'vegan' && (
                                 <div className="mb-8">
                                     <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500 flex items-center justify-between">
                                         <span>Section 2: Animal Products</span>
@@ -697,6 +929,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                     <div className="space-y-4">
                                         {/* Dairy */}
+                                        {dietaryPattern !== 'vegan' && (
                                         <div className="p-4 bg-gray-50 rounded-lg">
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥛 Dairy - (servings per week)
@@ -726,8 +959,10 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {/* Chicken and poultry */}
+                                        {dietaryPattern === 'balanced' && (
                                         <div className="p-4 bg-gray-50 rounded-lg">
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🍗 Chicken and poultry - (servings per week)
@@ -757,8 +992,10 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {/* Fish and shellfish */}
+                                        {(dietaryPattern === 'balanced' || dietaryPattern === 'pescatarian') && (
                                         <div className="p-4 bg-gray-50 rounded-lg">
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🐟 Fish and shellfish - (servings per week)
@@ -788,8 +1025,10 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {/* Eggs */}
+                                        {dietaryPattern !== 'vegan' && (
                                         <div className="p-4 bg-gray-50 rounded-lg">
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥚 Eggs - (servings per week)
@@ -820,8 +1059,10 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {/* Red meat */}
+                                        {dietaryPattern === 'balanced' && (
                                         <div className="p-4 bg-gray-50 rounded-lg">
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥩 Red meat - (servings per week)
@@ -851,8 +1092,10 @@ Based on this assessment, please provide personalized coaching to help me improv
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
                                     </div>
                                 </div>
+                                )}
 
                                 {/* Section 3: Fats & Other */}
                                 <div className="mb-8">
@@ -1006,8 +1249,15 @@ Based on this assessment, please provide personalized coaching to help me improv
                                     <div className="text-6xl font-bold text-gray-800 mb-2">
                                         {results.totalScore.toFixed(1)}/140
                                     </div>
-                                    <div className="text-2xl text-gray-600 mb-4">
+                                    <div className="text-2xl text-gray-600 mb-2">
                                         {results.percentage.toFixed(1)}% alignment
+                                    </div>
+                                    <div className="text-lg text-gray-500 mb-4">
+                                        {dietaryPattern === 'balanced' && 'Balanced (Flexitarian) Diet'}
+                                        {dietaryPattern === 'pescatarian' && 'Pescatarian Diet'}
+                                        {dietaryPattern === 'vegetarian' && 'Vegetarian Diet'}
+                                        {dietaryPattern === 'vegan' && 'Vegan Diet'}
+                                        {' • '}Compared to EAT-Lancet {dietaryPattern} guidelines
                                     </div>
 
                                     {/* Progress Bar */}
