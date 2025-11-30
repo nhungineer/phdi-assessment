@@ -796,7 +796,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                     <div className="space-y-4">
                                         {/* Whole grains */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.wholeGrains !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🌾 Whole grains - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -826,7 +826,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Tubers and starchy roots */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.potatoes !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥔 Tubers and starchy roots - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -857,7 +857,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Vegetables */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.vegetables !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥬 Vegetables - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -887,7 +887,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Fruits */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.fruits !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🍊 Fruits - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -916,7 +916,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Tree nuts and peanuts */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.nutsSeeds !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥜 Tree nuts and peanuts - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -945,7 +945,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Soy Legumes */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.soyLegumes !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🫛 Soy Legumes - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -975,7 +975,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Non-soy legumes */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.nonSoyLegumes !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🫘 Non-soy legumes - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1018,7 +1018,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                     <div className="space-y-4">
                                         {/* Dairy */}
                                         {dietaryPattern !== 'vegan' && (
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.dairy !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥛 Dairy - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1051,7 +1051,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                         {/* Chicken and poultry */}
                                         {dietaryPattern === 'balanced' && (
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.chicken !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🍗 Chicken and poultry - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1084,7 +1084,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                         {/* Fish and shellfish */}
                                         {(dietaryPattern === 'balanced' || dietaryPattern === 'pescatarian') && (
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.fish !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🐟 Fish and shellfish - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1117,7 +1117,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                         {/* Eggs */}
                                         {dietaryPattern !== 'vegan' && (
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.eggs !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥚 Eggs - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1151,7 +1151,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                         {/* Red meat */}
                                         {dietaryPattern === 'balanced' && (
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.redMeat !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🥩 Red meat - (servings per week)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1194,7 +1194,7 @@ Based on this assessment, please provide personalized coaching to help me improv
 
                                     <div className="space-y-4">
                                         {/* Unsaturated plant oils */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.vegetableOils !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🫒 Unsaturated plant oils - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1223,7 +1223,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Saturated oil and transfat */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.saturatedFats !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🧈 Saturated oil and transfat - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
@@ -1253,7 +1253,7 @@ Based on this assessment, please provide personalized coaching to help me improv
                                         </div>
 
                                         {/* Added sugar */}
-                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                        <div className={`p-4 rounded-lg ${formData.addedSugars !== '' ? 'bg-green-50' : 'bg-gray-50'}`}>
                                             <label className="block text-gray-700 font-semibold mb-2">
                                                 🍬 Added sugar - (servings per day)
                                                 <span className="block text-sm text-gray-500 font-normal mt-1">
