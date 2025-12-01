@@ -346,11 +346,12 @@
           );
 
           // 13. Unsaturated plant oils: 30g per serving
+          // PHDI 2024: 0g (0% TEI) = 0pts, 26g (≥10% TEI) = 10pts
           const oilServings = parseFloat(formData.vegetableOils) || 0;
           const oilPerDay = oilServings * 30;
           scores.vegetableOils = Math.min(
             10,
-            linearScore(oilPerDay, 10, targets.vegetableOils + 10, 0, 10)
+            linearScore(oilPerDay, 0, 26 * scaleFactor, 0, 10)
           );
 
           // MODERATE COMPONENTS (less is better - 10 points at target or below, 0 at excessive)
