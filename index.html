@@ -335,20 +335,13 @@
           );
 
           // 7. Non-soy legumes: 75g serving (weight 0.5)
+          // PHDI 2024: 0g = 0pts, 100g/day = 10pts
           const nonSoyFreq = parseFloat(formData.nonSoyLegumes) || 0;
           const nonSoyPerDay = (nonSoyFreq * 75) / 7;
           scores.nonSoyLegumes = Math.min(
             10,
-            linearScore(nonSoyPerDay, 0, targets.legumes * 0.33, 0, 10)
+            linearScore(nonSoyPerDay, 0, 100 * scaleFactor, 0, 10)
           );
-
-          // 10. Fish: 100g serving
-          const fishFreq = parseFloat(formData.fish) || 0;
-          const fishPerDay = (fishFreq * 100) / 7;
-          scores.fish =
-            targets.fish > 0
-              ? Math.min(10, linearScore(fishPerDay, 0, targets.fish, 0, 10))
-              : 10;
 
           // 13. Unsaturated plant oils: 30g per serving
           const oilServings = parseFloat(formData.vegetableOils) || 0;
@@ -410,19 +403,32 @@
             );
           }
 
+          // 10. Fish: 100g serving per week (MODERATION - less is better)
+          // PHDI 2024: ≤15g/day = 10pts, ≥50g/day = 0pts
+          const fishFreq = parseFloat(formData.fish) || 0;
+          const fishPerDay = (fishFreq * 100) / 7;
+          if (targets.fish === 0) {
+            // Vegetarian/Vegan: 10 points for no fish
+            scores.fish = 10;
+          } else {
+            // Less fish = better score (≤15g=10pts, ≥50g=0pts)
+            scores.fish = Math.max(0, linearScore(fishPerDay, 15, 50, 10, 0));
+          }
+
           // 12. Red meat: 100g serving
+          // PHDI 2024: ≤14g/day = 10pts, ≥300g/day = 0pts
           const redMeatFreq = parseFloat(formData.redMeat) || 0;
           const redMeatPerDay = (redMeatFreq * 100) / 7;
           if (targets.redMeat === 0) {
             // Pescatarian/Vegetarian/Vegan: 10 points for no red meat, 0 for excessive
             scores.redMeat = Math.max(
               0,
-              linearScore(redMeatPerDay, 0, 100, 10, 0)
+              linearScore(redMeatPerDay, 0, 300 * scaleFactor, 10, 0)
             );
           } else {
             scores.redMeat = Math.max(
               0,
-              linearScore(redMeatPerDay, targets.redMeat, 100, 10, 0)
+              linearScore(redMeatPerDay, 14 * scaleFactor, 300 * scaleFactor, 10, 0)
             );
           }
 
