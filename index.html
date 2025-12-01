@@ -375,18 +375,19 @@
           }
 
           // 9. Chicken: 100g serving
+          // PHDI 2024: ≤29g/day = 10pts, ≥58g/day = 0pts
           const chickenFreq = parseFloat(formData.chicken) || 0;
           const chickenPerDay = (chickenFreq * 100) / 7;
           if (targets.chicken === 0) {
             // Pescatarian/Vegetarian/Vegan: 10 points for no chicken, 0 for excessive
             scores.chicken = Math.max(
               0,
-              linearScore(chickenPerDay, 0, 100, 10, 0)
+              linearScore(chickenPerDay, 0, 58 * scaleFactor, 10, 0)
             );
           } else {
             scores.chicken = Math.max(
               0,
-              linearScore(chickenPerDay, targets.chicken, 100, 10, 0)
+              linearScore(chickenPerDay, 29 * scaleFactor, 58 * scaleFactor, 10, 0)
             );
           }
 
