@@ -447,11 +447,12 @@
           );
 
           // 15. Added sugar: 30g per serving
+          // PHDI 2024: ≤30g (≤5% TEI) = 10pts, ≥148g (≥25% TEI) = 0pts
           const sugarsServings = parseFloat(formData.addedSugars) || 0;
           const sugarsPerDay = sugarsServings * 30; // Already per day
           scores.addedSugars = Math.max(
             0,
-            linearScore(sugarsPerDay, targets.addedSugars, 150, 10, 0)
+            linearScore(sugarsPerDay, 30 * scaleFactor, 148 * scaleFactor, 10, 0)
           );
 
           // Calculate total score with weights (legumes are 0.5 each, others are 1)
