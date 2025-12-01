@@ -295,11 +295,13 @@
           // OPTIMUM COMPONENTS (more is better - 0 points at 0g, 10 points at target)
 
           // 1. Whole grains: 100g serving per week
+          // PHDI 2024: 0g = 0pts, 75g/day (women) or 90g/day (men) = 10pts
           const wholeGrainsFreq = parseFloat(formData.wholeGrains) || 0;
           const wholeGrainsPerDay = (wholeGrainsFreq * 100) / 7;
+          const wholeGrainsTarget = eerData.gender === 'male' ? 90 : 75; // Gender-specific targets
           scores.wholeGrains = Math.min(
             10,
-            linearScore(wholeGrainsPerDay, 0, targets.wholeGrains, 0, 10)
+            linearScore(wholeGrainsPerDay, 0, wholeGrainsTarget * scaleFactor, 0, 10)
           );
 
           // 3. Vegetables: 100g serving per day
