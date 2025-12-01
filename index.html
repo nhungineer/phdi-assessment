@@ -438,11 +438,12 @@
           }
 
           // 14. Saturated fats: 10g per serving
+          // PHDI 2024: ≤9g (≤3.5% TEI) = 10pts, ≥55g (≥21% TEI) = 0pts
           const saturatedServings = parseFloat(formData.saturatedFats) || 0;
           const saturatedPerDay = saturatedServings * 10;
           scores.saturatedFats = Math.max(
             0,
-            linearScore(saturatedPerDay, targets.saturatedFats, 30, 10, 0)
+            linearScore(saturatedPerDay, 9 * scaleFactor, 55 * scaleFactor, 10, 0)
           );
 
           // 15. Added sugar: 30g per serving
