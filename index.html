@@ -392,15 +392,16 @@
           }
 
           // 11. Eggs: 50g per egg
+          // PHDI 2024: ≤12g/day = 10pts, ≥120g/day = 0pts
           const eggsFreq = parseFloat(formData.eggs) || 0;
           const eggsPerDay = (eggsFreq * 50) / 7;
           if (targets.eggs === 0) {
             // Vegan: 10 points for no eggs, 0 for excessive
-            scores.eggs = Math.max(0, linearScore(eggsPerDay, 0, 120, 10, 0));
+            scores.eggs = Math.max(0, linearScore(eggsPerDay, 0, 120 * scaleFactor, 10, 0));
           } else {
             scores.eggs = Math.max(
               0,
-              linearScore(eggsPerDay, targets.eggs, 120, 10, 0)
+              linearScore(eggsPerDay, 12 * scaleFactor, 120 * scaleFactor, 10, 0)
             );
           }
 
